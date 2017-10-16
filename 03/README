@@ -1,0 +1,26 @@
+eliavsd
+===============================================================================
+Eliav Shames, ID 317390268, eliavsd@cs.huji.ac.il
+===============================================================================
+
+                           Project 2 - Sequential Chips
+                           ---------------------------------- 
+  
+
+Submitted Files
+---------------
+README - This file.
+Bit.hdl - A 1-bit register. Maintains 1 bit of memory.
+Register.hdl - A 16-bit register.
+RAM8.hdl - 16-bit / 8-register memory
+RAM64.hdl - 16-bit / 64-register memory
+RAM512.hdl - 16-bit / 512-register memory
+RAM4K.hdl - 16-bit / 4096-register memory
+RAM16K.hdl - 16-bit / 16384-register memory
+PC.hdl - A 16-bit program counter with load and reset control bits.
+
+Remarks
+-------
+* In addition to the primitive DFF chip and chips built on other chips produced
+ during the current project, Muxing and Demuxing were used frequently in order
+ to properly select a register with a given n-bit address.

@@ -1,0 +1,39 @@
+CHIP ExtendAlu{
+     IN x[16],y[16],instruction[9];
+     OUT out[16],zr,ng;
+     
+     PARTS:
+     // First we'll calculate each result seperately and then
+     // We'll use a custom 3-way Mux to decide which one is the output
+     
+     // First we'll multiply
+     Mul(a=x, b=y, out=mulOut);
+     
+     // Now we'll calculate the 4 possible shifts and use a 4-way Mux to
+     // Determine which one we may have been instructed to calculate
+	 ShiftLeft(in=x, out=xLeft);
+	 ShiftRight(in=x, out=xRight);
+	 ShiftLeft(in=y, out=yLeft);
+	 ShiftRight(in=y, out=yRight);
+	 
+	 // If instruction[4]=0 we shift Y, otherwise X. if instruction[5]=0 we
+	 // Shift right, otherwise left.
+	 // After this operation, if the instruction is a shift, shiftOut will
+	 // Contain the correct shift output
+	 Mux4Way16(a=yRight, b=xRight, c=yLeft, d=xLeft, sel=instruction[4..5],
+	  out=shiftOut);
+	 
+	 //Calculate the ALU output
+	 ALU(x=x, y=y, zx=instruction[5], nx=instruction[4], zy=instruction[3],
+	  ny=instruction[2], f=instruction[1], no=instruction[0], out=aluOut,
+	   zr=aluZr, ng=aluNg);
+	 
+	 // Here we determine whether we were instructed to calculate
+	 // alu,mul or shift
+	 Mux3Way16(a=mulOut, b=shiftOut, c=aluOut, sel=instruction[7..8], 
+	 out[15]=ng, out=tmpOut, out=out);
+
+     // If there is a non-zero bit in tmpOut, then zr=false
+     Or16Way(in=tmpOut, out=notZr);
+     Not(in=notZr, out=zr);
+}

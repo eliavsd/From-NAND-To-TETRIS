@@ -1,0 +1,162 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Math.jack
+
+/**
+ * A basic math library.
+ */
+class Math {
+	static Array pows_of_2;
+
+    /** Initializes the library. */
+    function void init() {
+    	var int cur, i;
+    	let pows_of_2 = Array.new(16);
+    	let cur = 1;
+    	let i = 0;
+    	while(i < 16) {
+    		let pows_of_2[i] = cur;
+    		let cur = cur + cur;
+    		let i = i + 1;
+    	}
+    	return;
+    }
+	
+	function int shift_left(int x, int times) {
+		var int i;
+		let i = 0;
+		while (i < times) {
+			let x = x + x;
+			let i = i + 1;
+		}
+		return x;
+	}
+	
+	function int shift_right(int x, int times) {
+		var int result, i;
+		let result = 0;
+		let i = times;
+		while (i < 16) {
+			if ((pows_of_2[i] & x) = pows_of_2[i]) {
+				let result = result + pows_of_2[i - times];
+			}
+			let i = i + 1;
+		}
+		return result;
+		// return (Math.divide(x,pows_of_2[times]));
+	}
+	
+	
+	function int mod (int a, int b) {
+		return (a - (Math.multiply(b, Math.divide(a, b))));
+	}
+	
+    /** Returns the absolute value of x. */
+    function int abs(int x) {
+		if (x < 0) {
+			return (-x);
+		}
+		return x;
+    }
+	
+    /** Returns the product of x and y. */
+    function int multiply(int x, int y) {
+		var int flip, sum, j, temp;
+		let flip = 1;
+		if (x < 0) {
+			let x = -x;
+			let flip = -flip;
+		}
+		if (y < 0) {
+			let y = -y;
+			let flip = -flip;
+		}
+		let sum = 0;
+		let j = 0;
+		while (j < 16) {
+			let temp = y&pows_of_2[j];
+			if (temp = pows_of_2[j]) {
+				let sum = sum + x;
+			}
+			let x = x + x;
+			let j = j + 1;
+		}
+		if (flip = 1) {
+			return sum;
+		}
+		return (-sum);
+    }
+	
+	function int actual_divide(int x, int y) {
+		var int q;
+		if ((y > x) | (y < 0)) {
+			return 0;
+		}
+		let q = Math.actual_divide(x, y + y);
+		if (x - Math.multiply(q + q,y) < y){
+			return (q + q);
+		}
+		return (q + q + 1);
+    }
+
+    /** Returns the integer part of x/y. */
+    function int divide(int x, int y) {
+		var int flip, result;
+		if (y = 0) {
+            do Sys.error(3);
+		}
+		let flip = 1;
+		if (x < 0) {
+			let x = -x;
+			let flip = -flip;
+		}
+		if (y < 0) {
+			let y = -y;
+			let flip = -flip;
+		}
+		let result = Math.actual_divide(x, y);
+		if (flip = 1) {
+			return result;
+		}
+		return (-result);
+    }
+
+    /** Returns the integer part of the square root of x. */
+    function int sqrt(int x) {
+		var int y, j, temp;
+		if (x < 0) {
+            do Sys.error(4);
+		}
+		let y = 0;
+		let j = 7;
+		while (j > -1) {
+			let temp = Math.multiply((y + pows_of_2[j]),(y + pows_of_2[j]));
+			if ((temp > 0) & ((temp < x) | (temp = x))) {
+				let y = (y + pows_of_2[j]);
+			}
+			let j = j - 1;
+		}
+		return y;
+    }
+
+    /** Returns the greater number. */
+    function int max(int a, int b) {
+		if (a > b) {
+			return a;
+		}
+		return b;
+    }
+
+    /** Returns the smaller number. */
+    function int min(int a, int b) {
+		if (a < b) {
+			return a;
+		}	
+		return b;
+    }
+	
+	function int get_pow_of_2(int i) {
+		return pows_of_2[i];
+	}
+}

@@ -1,0 +1,19 @@
+eliavsd,avikor13
+===============================================================================
+Eliav Shames, ID 317390268, eliavsd@cs.huji.ac.il
+Avi Korzec, ID 305088106, avikor13@cs.huji.ac.il
+===============================================================================
+
+                           Project 4 - The HACK machine
+                           ---------------------------------- 
+  
+
+Submitted Files
+---------------
+README - This file.
+Divide.asm - Divides R13 by R14 and stores result in R15
+Fill.asm - If a key is pressed, blackens the screen.
+		Otherwise, clears the screen
+Mult.asm - Multiplies R0 by R1 and stores result in R2
+Sort.asm - Sorts an array starting at the address
+		In R14 with length of value R15

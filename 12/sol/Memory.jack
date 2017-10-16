@@ -1,0 +1,77 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * Memory operations library.
+ */ 
+class Memory {
+	static Array mem;
+	static int mem_start, mem_end;
+	
+    /** Initializes memory parameters. */
+    function void init() {
+		let mem = 0;
+		let mem_start = 2048;
+		let mem_end = 16383;
+		let mem[mem_start] = mem_end - mem_start;
+		let mem[mem_start + 1] = -1;
+		return;
+    }
+
+    /** Returns the value of the main memory at the given address. */
+    function int peek(int address) {
+        return mem[address];
+    }
+
+    /** Sets the value of the main memory at this address
+     *  to the given value. */
+    function void poke(int address, int value) {
+        let mem[address] = value;
+        return;
+
+    }
+
+    /** finds and allocates from the heap a memory block of the 
+     *  specified size and returns a reference to its base address. */
+    function int alloc(int size) {
+		var int addr, curr, prev;
+		
+		if (size < 1) {
+            do Sys.error(5); // Alloc size must be positive
+		}
+		
+		let addr = -1;
+		let prev = mem_start;
+		let curr = mem_start;
+		while (~(curr = -1) & ~(mem[curr] > size)) {
+			let prev = curr;
+			let curr = mem[curr + 1];
+		}
+		if (~(curr = -1)) {
+			if (mem[curr] < (size + 3)) {
+				let mem[prev + 1] = mem[curr + 1];
+				let mem[curr] = size + 1;
+				let addr = curr + 1;
+			}
+			else {
+				let mem[curr] = mem[curr] - size - 1;
+				let addr = curr + mem[curr];
+				let mem[addr - 1] = size + 1;
+			}
+		}
+		else {
+            do Sys.error(6); // Not enough space in the heap
+		}
+		return addr;
+    }
+
+    /** De-allocates the given object and frees its space. */
+    function void deAlloc(int object) {
+		let mem[object] = mem[object - 1];
+		let mem[object + 1] = mem[mem_start + 1];
+		let mem[mem_start + 1] = object;
+		return;
+    }    
+}

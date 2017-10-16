@@ -1,0 +1,189 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Screen.jack
+
+/**
+ * Graphic screen library.
+ */
+class Screen {
+	static Array pows_of_2;
+	static boolean color;
+	static int scr_start, scr_end;
+
+    /** Initializes the Screen. */
+    function void init() {
+		var int cur, i;
+		let color = true;
+		let scr_start = 16384;
+		let scr_end = 24576;
+    	let pows_of_2 = Array.new(16);
+    	let cur = 1;
+    	let i = 0;
+    	while(i < 16) {
+    		let pows_of_2[i] = cur;
+    		let cur = cur + cur;
+    		let i = i + 1;
+    	}
+		return;
+    }
+
+    /** Erases the whole screen. */
+    function void clearScreen() {
+		var int i;
+		let i = scr_start;
+		while (i < scr_end) {
+			do Memory.poke(i, false);
+			let i = i + 1;
+		}
+		return;
+    }
+
+    /** Sets the color to be used in further draw commands
+     *  where white = false, black = true. */
+    function void setColor(boolean b) {
+		let color = b;
+		return;
+    }
+	
+	function int isValidCoords(int x, int y) {
+		if ((y < 0) | (y > 255) | (x < 0) | (x > 511)) {
+			return -1;
+		}
+		return 0;
+	}
+
+    /** Draws the (x, y) pixel. */
+    function void drawPixel(int x, int y) {
+		var int addr, segment, pixel;
+		if (Screen.isValidCoords(x,y) = -1) {
+			do Sys.error(7); // Bad pixel coordinates
+		}
+		let addr = scr_start + (Math.shift_left(y,5)) + Math.shift_right(x,4);
+		let segment = Memory.peek(addr);
+		let pixel = pows_of_2[x & 15];
+		if (color) {
+			do Memory.poke(addr, (segment | pixel));
+		}
+		else {
+			do Memory.poke(addr, (segment & ~pixel));
+		}
+		return;
+    }
+	
+	function void drawVerticalLine(int x, int y1, int y2) {
+		var int temp;
+		if (y1 > y2) {
+			let temp = y1;
+			let y1 = y2;
+			let y2 = temp;
+		}
+		// Unfortunately because pixel blocks are horizontal lines only
+		// We cannot draw an entire vertical block at once
+		while (~(y1 > y2)) {
+			do Screen.drawPixel(x, y1);
+			let y1 = y1 + 1;
+		}
+		return;
+	}
+	
+	function void drawHorizontalLine(int x1, int x2, int y) {
+		var int temp, addr;
+		if (x1 > x2) {
+			let temp = x1;
+			let x1 = x2;
+			let x2 = temp;
+		}
+		while (~(x1 > x2)) {
+			if ((~((x2 - x1) < 16)) & ((x1 & 15) = 0)) { // Attempt to color a register by bulk
+				let addr = scr_start + (Math.shift_left(y,5)) + Math.shift_right(x1,4);
+				do Memory.poke(addr, color);
+				let x1 = x1 + 16;
+			}
+			else {
+				do Screen.drawPixel(x1, y);
+				let x1 = x1 + 1;
+			}
+		}
+		return;
+	}
+	
+    /** Draws a line from (x1, y1) to (x2, y2). */
+    function void drawLine(int x1, int y1, int x2, int y2) {
+		var int adyMinusbdx, a, b, dx, dy, a_step, b_step;
+		if ((Screen.isValidCoords(x1, y1) = -1) | (Screen.isValidCoords(x2,y2) = -1)) {
+			do Sys.error(8); // Bad line coordinates
+		}
+		if (x1 = x2) {
+			do Screen.drawVerticalLine(x1, y1, y2);
+			return;
+		}
+		if (y1 = y2) {
+			do Screen.drawHorizontalLine(x1, x2, y1);
+			return;
+		}
+		let adyMinusbdx = 0;
+		let a = 0;
+		let b = 0;
+		let dx = x2 - x1;
+		let dy = y2 - y1;
+		if (dx < 0) {
+			let a_step = -1;
+		}
+		else {
+			let a_step = 1;
+		}
+		if (dy < 0) {
+			let b_step = -1;
+		}
+		else {
+			let b_step = 1;
+		}
+		let dx = Math.abs(dx);
+		let dy = Math.abs(dy);
+		while ((~(Math.abs(a) > dx)) & (~(Math.abs(b) > dy))) {
+			do Screen.drawPixel(x1 + a, y1 + b);
+			if (adyMinusbdx < 0) {
+				let adyMinusbdx = adyMinusbdx + dy;
+				let a = a + a_step;
+			}
+			else {
+				let adyMinusbdx = adyMinusbdx - dx;
+				let b = b + b_step;
+			}
+		}
+		return;
+    }
+
+    /** Draws a filled rectangle where the top left corner
+     *  is (x1, y1) and the bottom right corner is (x2, y2). */
+    function void drawRectangle(int x1, int y1, int x2, int y2) {
+		if ((Screen.isValidCoords(x1, y1) = -1) | (Screen.isValidCoords(x2,y2) = -1)) {
+			do Sys.error(9); // Bad rectangle coordinates
+		}
+		while (y1 < y2) {
+			do Screen.drawHorizontalLine(x1,x2,y1);
+			let y1 = y1 + 1;
+		}
+		return;
+    }
+
+    /** Draws a filled circle of radius r around (cx, cy). */
+    function void drawCircle(int cx, int cy, int r) {
+		var int dy, dy_squared, r_squared;
+		if (Screen.isValidCoords(cx, cy) = -1) {
+			do Sys.error(12); // Bad circle center coordinates
+		}
+		if ((Screen.isValidCoords(cx - r, cy - r) = -1) | (Screen.isValidCoords(cx + r, cy + r) = -1)) {
+			do Sys.error(13); // Bad circle radius coordinates
+		}
+		let dy = -r;
+		let r_squared = r * r;
+		while (~(dy > r)) {
+			let dy_squared = dy * dy;
+			do Screen.drawLine(cx - Math.sqrt(r_squared - dy_squared), cy + dy, cx + Math.sqrt(r_squared - dy_squared), cy + dy);
+			let dy = dy + 1;
+		}
+		return;
+    }
+}

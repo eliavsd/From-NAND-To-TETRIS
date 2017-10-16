@@ -1,0 +1,35 @@
+eliavsd
+===============================================================================
+Eliav Shames, ID 317390268, eliavsd@cs.huji.ac.il
+===============================================================================
+
+                           Project 1 - Elementary Logic Gates
+                           ---------------------------------- 
+  
+
+Submitted Files
+---------------
+README - This file.
+Not.hdl - The NOT logic gate.
+And.hdl - The AND logic gate.
+Or.hdl - The OR logic gate.
+Xor.hdl - The XOR logic gate.
+Mux.hdl - A 2-way multiplexer.
+DMux.hdl - A 2-way demultiplexer.
+Not16.hdl - A 16-bit bitwise NOT logic gate.
+And16.hdl - A 16-bit bitwise AND logic gate.
+Or16.hdl - A 16-bit bitwise OR logic gate.
+Mux16.hdl - A 16-bit multiplexer.
+Or8Way.hdl - An 8-way OR logic gate.
+Mux4Way16.hdl - A 16-bit 4-way multiplexer.
+Mux8Way16.hdl - A 16-bit 8-way multiplexer.
+DMux4Way.hdl - A 4-way demultiplexer.
+DMux8Way.hdl - An 8-way demultiplexer.
+
+Remarks
+-------
+* Using the primitive NAND gate, the NOT gate was built. From that point, every
+2-way gate was built on top of previously built chips in the listed order.
+4-way and bitwise gates were built using the respective 2-way gates. 8-way gates
+were built using respective 4-way gates as well.
+

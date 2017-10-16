@@ -1,0 +1,255 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Screen.jack
+
+/**
+ * Graphic screen library.
+ */
+class Screen {
+
+	static int SCR, SCR_END;
+	static boolean blackPixel;
+	static Array powersOfTwo;
+	
+    /** Initializes the Screen. */
+    function void init() {
+    let SCR = 16384;
+    let SCR_END = 24576;
+    let blackPixel = true;
+    do Screen.initPow();
+	return;
+    }
+    
+    /** Initialized the powersOfTwo array */
+    function void initPow() {
+        var int currentVal, currentBit;
+    	let powersOfTwo = Array.new(16);
+		let currentBit = 0;
+		let currentVal = 1;
+		while(currentBit < 16) {
+			let powersOfTwo[currentBit] = currentVal;
+			let currentVal = currentVal + currentVal; // We use addition here
+			// Because multiplication is a more expensive operation
+			let currentBit = currentBit + 1;
+		}
+		return;
+    }
+
+    /** Erases the whole screen. */
+    function void clearScreen() {
+    	var int currentPixel;
+		let currentPixel = SCR; // Start at (0, 0)
+		while (currentPixel < SCR_END) { 
+			// Iterate until (511, 255)
+			// Change pixel to 0 (white)
+			do Memory.poke(currentPixel, false);
+			// Treating a pixel as a boolean if more convenient in this class
+			// Because it naturally follows that black and white are
+			// Opposite values for pixels.
+			// Next pixel
+			let currentPixel = currentPixel + 1;
+		}
+		return;
+    }
+
+    /** Sets the color to be used in further draw commands
+     *  where white = false, black = true. */
+    function void setColor(boolean b) {
+    	let blackPixel = b;
+    	return;
+    }
+
+    /** Draws the (x, y) pixel. */
+    function void drawPixel(int x, int y) {
+    	var int pixelAddress, pixelSegment, pixel;
+    	// Are the given pixel coordinates valid?
+		if (~(Screen.validXY(x, y))) {
+			do Sys.error(7);
+		}
+		// For multiplication or division by powers of two, bitwise shifts
+		// Are faster
+		let pixelAddress = SCR + Math.shiftLeft(y,5) + Math.shiftRight(x,4);
+		let pixelSegment = Memory.peek(pixelAddress);
+		// x % 16 because x is non-negative
+		let pixel = powersOfTwo[x & 15];
+		if (blackPixel) {			
+			do Memory.poke(pixelAddress, (pixelSegment | pixel));
+		}
+		else {
+			do Memory.poke(pixelAddress, (pixelSegment & ~pixel));
+		}
+		return;
+    }
+
+    /** Draws a line from (x1, y1) to (x2, y2). */
+    function void drawLine(int x1, int y1, int x2, int y2) {
+    	var int dx, dy;
+    	var int a, b; // The number of x and y steps we've taken
+    	var int nextA, nextB; // determines whether the next a (and b)
+    	// Move is right (or up) or left (or down) respectively
+    	var int diff; // Stores a*dy - b*dx as per the beautiful solution
+    	// Presented in lecture 12.7
+    	// First, check validity of the line coordinates
+		if (~(Screen.validXY(x1, y1)) | ~(Screen.validXY(x2,y2))) {
+			do Sys.error(8);
+		}
+		// These are base cases that can be dealt with in a more optimal fashion
+		
+		// Horizontal line
+		if (y1 = y2) {
+			do Screen.horizontal(x1, x2, y1);
+			return;
+		}
+		
+		// Vertical line
+		if (x1 = x2) {
+			do Screen.vertical(x1, y1, y2);
+			return;
+		}
+		
+		//Otherwise we have a diagonal line
+		let diff = 0;
+		let a = 0;
+		let b = 0;
+		let dx = x2 - x1;
+		let dy = y2 - y1;
+		// If x1 is greater than x2 we have to move left (backwards)
+		if (dx < 0) {
+			let nextA = -1;
+		}
+		else {
+			let nextA = 1;
+		}
+		// If y1 is greater than y2 we have to move down		
+		if (dy < 0) {
+			let nextB = -1;
+		}
+		else {
+			let nextB = 1;
+		}
+		
+		// Now that we know the line direction, we need to know the true
+		// dx and dy values. Distance values are non-negative...
+		let dx = Math.abs(dx);
+		let dy = Math.abs(dy);
+		
+		// If the number of horizontal steps has not yet surpassed dx
+		// We still have work to do. Same for b and dy.
+		while (~(Math.abs(a) > dx) & ~(Math.abs(b) > dy)) {
+			do Screen.drawPixel(x1 + a, y1 + b);
+			if (diff < 0) {
+				let a = a + nextA;
+				let diff = diff + dy;
+			}
+			else {			
+				let b = b + nextB;
+				let diff = diff - dx;
+			}
+		}
+		return;
+    }
+    
+    /** Handles drawing a horizontal line when dy=0 */
+    function void horizontal(int x1, int x2, int y) {
+    	var int address, tmp;
+    	if (x1 > x2) {
+			let tmp = x2;
+			let x2 = x1;
+			let x1 = tmp;
+		}
+		while (~(x1 > x2)) {
+			if (((x2 - x1) > 15) & ((x1 & 15) = 0)) {
+				// If the above condition is true, we can color the entire line
+				// Black in one operation. Much faster!
+				// For multiplication or division by powers of two, bitwise
+				// Shifts are faster
+				let address = SCR + Math.shiftLeft(y,5) + Math.shiftRight(x1,4);
+				do Memory.poke(address, blackPixel);
+				let x1 = x1 + 16;
+			}
+			else { // Otherwise we just draw one pixel and move on
+				do Screen.drawPixel(x1, y);
+				let x1 = x1 + 1;
+			}
+		}
+		return;
+    }
+    
+    /** Handles drawing a vertical line when dx=0 */
+    function void vertical(int x, int y1, int y2) {
+    	var int tmp;
+		if (y1 > y2) {
+			let tmp = y2;
+			let y2 = y1;
+			let y1 = tmp;
+		}
+		// Unfortunately because pixel blocks are horizontal lines only
+		// We cannot draw an entire vertical block at once
+		while (~(y1 > y2)) {
+			do Screen.drawPixel(x, y1);
+			let y1 = y1 + 1;
+		}
+		return;
+    }
+
+    /** Draws a filled rectangle where the top left corner
+     *  is (x1, y1) and the bottom right corner is (x2, y2). */
+    function void drawRectangle(int x1, int y1, int x2, int y2) {
+    	var int tmp;
+    	// First we must check the coordinates
+    	if (~(Screen.validXY(x1, y1)) | ~(Screen.validXY(x2,y2))) {
+			do Sys.error(9);
+		}
+		// If necessary, switch y1 and y2 so that we know that y2>y1
+        if (y2 < y1)
+        {
+            let tmp = y2;
+            let y2 = y1;
+            let y1 = tmp;
+        }   
+        
+        while(~(y1 > y2))
+        {
+            do Screen.drawLine(x1, y1, x2, y1);
+            let y1 = y1 + 1;
+        }
+        return;
+    }
+
+    /** Draws a filled circle of radius r around (cx, cy). */
+    function void drawCircle(int cx, int cy, int r) {
+        var int dx, dy, dySq, rSq;
+        // Check center coordinates
+        if (~Screen.validXY(cx, cy))
+        {
+            do Sys.error(12);
+        }
+        // Check radius coordinates
+        if (~Screen.validXY(cx + r, cy) | ~Screen.validXY(cx - r, cy)
+            | ~Screen.validXY(cx, cy + r) | ~Screen.validXY(cx, cy - r))
+        {
+            do Sys.error(13);
+        }
+        
+        let dy = -r;
+        let rSq = r * r;
+        while (~(dy > r))
+        {
+        	let dySq = dy * dy;
+            let dx = Math.sqrt(rSq - dySq);
+            do Screen.drawLine((cx-dx), (cy+dy), (cx+dx), (cy+dy));
+            let dy = dy + 1;
+        }     
+        return;
+    }
+    
+    /** Checks if a given pair of (x, y) coordinates are valid.
+    	Returns 1 iff the coordinates are valid.  */
+    function boolean validXY(int x, int y) {
+    	if (((x < 0) | (x > 511)) | ((y < 0) | (y > 255))) {
+    		return false;
+    	}
+    	return true;
+    }
+}

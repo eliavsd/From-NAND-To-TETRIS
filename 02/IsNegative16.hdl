@@ -1,0 +1,25 @@
+/**
+ 
+ * 16-bit negative number identifier chip.
+ 
+ * Checks the most significant bit. If it is 1 then the number is
+ * negative. Otherwise, it's positive.
+ */
+
+
+
+CHIP IsNegative16 {
+
+	IN
+ in[16]; //16-bit input.
+
+	OUT
+ out;  //1-bit result of comparation.
+
+
+
+	PARTS:
+
+		And(a=in[15],b=true,out=out);
+
+}

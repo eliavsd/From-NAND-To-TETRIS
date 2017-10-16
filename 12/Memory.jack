@@ -1,0 +1,87 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * Memory operations library.
+ */ 
+class Memory {
+	static Array ram;
+	static int heapBase, heapEnd, freePtr;
+
+    /** Initializes memory parameters. */
+    function void init() {
+    	let ram = 0;
+    	let heapBase = 2048;
+    	let heapEnd = 16383;
+    	let ram[heapBase + 1] = heapEnd - heapBase;
+    	let freePtr = heapBase + 2;
+    	let ram[freePtr + 1] = -1;
+    	return;
+    }
+
+    /** Returns the value of the main memory at the given address. */
+    function int peek(int address) {
+    	return ram[address];
+    }
+
+    /** Sets the value of the main memory at this address
+     *  to the given value. */
+    function void poke(int address, int value) {
+    	let ram[address] = value;
+    	return;
+    }
+
+    /** finds and allocates from the heap a memory block of the 
+     *  specified size and returns a reference to its base address. */
+    function int alloc(int size) {
+    	var int currPtr, prevPtr, block;
+    	if (~(size > 0)) { //Is the allocation size non-positive?
+    		do Sys.error(5);
+    	}
+    	let currPtr = freePtr;
+    	let prevPtr = -1;
+    	while (ram[currPtr - 1] < size) {
+    		let prevPtr = currPtr;
+    		let currPtr = ram[currPtr - 2];
+    	}
+    	
+    	// Heap overflow
+    	if (currPtr = -1) {
+    		do Sys.error(6);
+    	}
+    	
+    	// If there's no more space in the current block
+    	if ((ram[currPtr - 1] < (size + 2)) | (ram[currPtr - 1] = (size + 2))){
+			if (~(prevPtr > -1)) {
+				let freePtr = ram[currPtr - 2];
+			}
+			else {
+				let ram[prevPtr - 2] = ram[currPtr - 2];
+			}
+    	}
+    	else{
+    		if ((prevPtr < -1) | (prevPtr = -1)) {
+	    		let freePtr = currPtr + size + 2;
+	    		let ram[freePtr - 2] = ram[currPtr - 2];
+	    		let ram[freePtr - 1] = ram[currPtr - 1] - size - 2;
+    		}
+    		else {
+    			let block = currPtr + size + 2;
+    			let ram[prevPtr - 2] = block;
+    			let ram[block - 2] = ram[currPtr - 2];
+    			let ram[block - 1] = ram[currPtr - 1] - size - 2;	
+    		}
+    	}
+    	let ram[currPtr - 1] = size;
+    	return currPtr - 1;
+    }
+
+    /** De-allocates the given object and frees its space. */
+    function void deAlloc(int object) {
+    	let ram[object - 1] = freePtr;
+    	let freePtr = object + 1;
+    	return;
+    }    
+}

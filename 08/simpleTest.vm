@@ -1,0 +1,11 @@
+push constant 30000
+neg
+push constant 30000
+eq
+
+
+// put before every .asm file:
+// @256
+// D=A
+// @0
+// M=D

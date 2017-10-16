@@ -1,0 +1,30 @@
+eliavsd,avikor13
+===============================================================================
+Eliav Shames, ID 317390268, eliavsd@cs.huji.ac.il
+Avi Korzec, ID 305088106, avikor13@cs.huji.ac.il
+===============================================================================
+
+                           Project 11 - Compiler part II
+                           ----------------------
+     The JackCompiler class receives 1 argument: The path to a .jack file or a path to a
+     directory which has .jack files.
+     
+     This class instances a pair of Tokenizer and Compiler instances to each and every .jack file.
+     The Tokenizer creates an ArrayList of Tokens which were generated from the .jack file.
+     The Compiler then takes this ArrayList of Tokens and writes the corresponding VM commands into 
+     a .vm file. 
+  
+
+Submitted Files
+---------------
+README - This file.
+makefile - Compiles the Compiler project
+JackCompiler - Executed the compiled project
+JackCompiler.java    - The main program: receives an argument containing the .jack
+					   file/folder path and reads the content, and then tokenize and
+					   writes the writes corresponding VM commands into a .vm file. 
+Token.java           - A Class that represents a token.
+Tokenizer.java       - A class that receives .jack file and tokens it character by character.
+Compiler.java        - The class that writes the meaning of the generated tokens to a .xml file.
+SymboleTable.java    - Static class that deals with symbols in the class and subroutine level.
+VMWriter.java        - Static class that writes corresponding VM commands to the given .jack files

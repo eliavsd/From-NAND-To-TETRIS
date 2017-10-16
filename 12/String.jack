@@ -1,0 +1,162 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/String.jack
+
+/**
+ * Represents a String object. Implements the String type.
+ */
+class String {
+	field Array cString;
+	field int len, maxLen;
+
+    /** Constructs a new empty String with a maximum length of maxLength. */
+    constructor String new(int maxLength) {
+    	if (maxLength < 0) {
+    		do Sys.error(14);
+    	}
+    	let maxLen = maxLength;
+    	let len = 0;
+    	if(maxLen > 0) {
+    	let cString = Array.new(maxLen);
+    	}
+    	return this;
+    }
+
+    /** De-allocates the string and frees its space. */
+    method void dispose() {
+    	do Memory.deAlloc(this);
+    	return;
+    }
+
+    /** Returns the current length of this String. */
+    method int length() {
+    	return len;
+    }
+
+    /** Returns the character at location j. */
+    method char charAt(int j) {
+    	// Check bounds for string index
+    	if (j > len) {
+    		do Sys.error(15);
+    	}
+    	return cString[j];
+    }
+
+    /** Sets the j'th character of this string to be c. */
+    method void setCharAt(int j, char c) {
+        // Check bounds for string index
+    	if (j > len) {
+    		do Sys.error(16);
+    	}
+    	let cString[j] = c;
+    	return;
+    }
+
+    /** Appends the character c to the end of this String.
+     *  Returns this string as the return value. */
+    method String appendChar(char c) {
+        // Check bounds for string index
+    	if (len = maxLen) {
+    		do Sys.error(17);
+    	}
+    	let len = len + 1;
+    	let cString[len - 1] = c;
+		return this;
+    }
+
+    /** Erases the last character from this String. */
+    method void eraseLastChar() {
+    	if (len = 0) {
+    		do Sys.error(18);
+    	}
+    	let len = len - 1;
+    	return;
+    }
+
+    /** Returns the integer value of this String until the first non
+     *  numeric character. */
+    method int intValue() {
+    	var int i, sum;
+		var boolean isNegative;
+		
+		let sum = 0;
+		// If the string is not empty and the first char is 45 (ASCII '-')
+		// Then the number is negative
+		if ((len > 0) & (charAt(0) = 45)) {
+			let isNegative = true;
+			// Move to the next character, the number begins at cString[1]
+			let i = 1;
+		}
+		else {
+			let isNegative = false;
+			let i = 0;
+		}
+		
+		while (i < len) {
+			// If the current char is a digit
+			if (charAt(i) > 47 & charAt(i) < 58) {
+				let sum = (sum * 10) + (charAt(i) - 48);
+			}
+			let i = i + 1;
+		}
+		
+		
+		if (isNegative) {
+			let sum = -sum;
+		}
+		return sum;
+    }
+
+    /** Sets this String to hold a representation of the given number. */
+    method void setInt(int number) {
+        var String tmpStr; // Eventually will contain the number, but backwards
+        var bool isNegative;
+        var int mod10;
+        
+        let tmpStr = String.new(maxLen);   
+        
+        if (number < 0)
+        {
+            let isNegative = true;
+            let number = -number;
+        }
+        else {
+        	let isNegative = false;
+        }
+        
+        while (number > 0)
+        {
+        	let mod10 = number - (Math.multiply(Math.divide(number, 10), 10));
+            do tmpStr.appendChar(mod10 + 48);
+            let number = number / 10;
+        }
+        
+        if (isNegative)
+        {
+            do tmpStr.appendChar(45);
+        }
+        // Begin changing this string to contain tmpStr in reverse
+        let len = 0;
+        while (len < tmpStr.length())
+        {
+            do appendChar(tmpStr.charAt(tmpStr.length() - len - 1));
+        }
+        return;
+    }
+
+    /** Returns the new line character. */
+    function char newLine() {
+    	return 128;
+    }
+
+    /** Returns the backspace character. */
+    function char backSpace() {
+    	return 129;
+    }
+
+    /** Returns the double quote (") character. */
+    function char doubleQuote() {
+    	return 34;
+    }
+}

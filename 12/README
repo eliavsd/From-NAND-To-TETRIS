@@ -1,0 +1,33 @@
+eliavsd,avikor13
+===============================================================================
+Eliav Shames, ID 317390268, eliavsd@cs.huji.ac.il
+Avi Korzec, ID 305088106, avikor13@cs.huji.ac.il
+===============================================================================
+
+                           Project 12 - OS
+                           ---------------
+     An implementation of basic OS elements as specified in the exercise.        
+
+  
+
+Submitted Files
+---------------
+README - This file.
+makefile - Compiles the Assembler project
+Array.jack - An implementation of an array class
+Keyboard.jack - An implementation of the hack keyboard
+Math.jack - An implementation of basic mathematical operations such as
+			Multiplication, division, sqrt and others
+						
+Memory.jack - An implementation of the hack machine's heap memory
+Output.jack - An implementation of the hack output module of the OS. This
+				Class actually controls the cursor and prints output to the
+				screen
+				
+Screen.jack - An implentation of the screen (512 x 256 pixels). Controls each
+				Individual pixel and can also draw lines, rectangles and circles
+
+String.jack - Contains a string object class, including basic operations such
+				as append and conversion to/from an integer
+				
+Sys.jack - Contains the OS bootstrapper as well as other basic system services.

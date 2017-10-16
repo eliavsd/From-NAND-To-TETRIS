@@ -1,0 +1,29 @@
+eliavsd,avikor13
+===============================================================================
+Eliav Shames, ID 317390268, eliavsd@cs.huji.ac.il
+Avi Korzec, ID 305088106, avikor13@cs.huji.ac.il
+===============================================================================
+
+                           Project 7 - Compiler part I
+                           ----------------------
+     The VMtoAssemblerTranslator class receives 1 argument: The path to a .VM file or a path to a 
+     directory which has .vm files. 
+     
+     This class instances a VMparser instance to each and every .vm file, and a single 
+     AssemblerWriter instance to write all of the translated Virtual Language to Assembly Language.
+     It writes the translted commands in a single .asm file which have the name of the given path,
+     as well as being saved to the given path. 
+
+  
+
+Submitted Files
+---------------
+README - This file.
+makefile - Compiles the Compiler project
+VMtranslator - Executed the compiled project
+VMtranslator.java    - The main program: receives an argument containing the .VM
+					   file/folder path and reads the content, and then translates and 
+					   writes the translted commands into a single .asm file.
+VMparser.java        - A class that receives .VM file and parse it line by line.
+AssemblerWriter.java - The class that actually translates Virtual Language commands to Assembly 
+                       Languages commands, and then writes them to an .asm file.

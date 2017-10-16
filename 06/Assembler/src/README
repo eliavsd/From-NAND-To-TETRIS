@@ -1,0 +1,35 @@
+eliavsd,avikor13
+===============================================================================
+Eliav Shames, ID 317390268, eliavsd@cs.huji.ac.il
+Avi Korzec, ID 305088106, avikor13@cs.huji.ac.il
+===============================================================================
+
+                           Project 6 - Assembler
+                           ----------------------
+     The Assembler class receives 1 argument: The path to an ASM file/folder
+     
+     The program performs 3 passes over the code:
+     
+     1. Removal of comments and spaces
+     2. Extraction of label symbols and storing them in the symbol HashMap
+     3. Translation of remaining commands into hack machine code
+     
+     The storage of symbols and translations of commands are stored in HashMaps
+     defined in Consts.java                  
+
+  
+
+Submitted Files
+---------------
+README - This file.
+makefile - Compiles the Assembler project
+Assembler - Executed the compiled project
+Assembler.java - The main program: receives an argument containing the ASM
+				file/folder path and reads the file, sends the text to the 
+				parser and writes the hack machine language output to .hack file
+				in the original directory
+Parser.java - A class that receives ASM text code and translates it
+				into hack machine code
+Consts.java - A class storing constants used throughout the code, including
+				the translations of parts of ASM commands to their appropriate
+				bits.

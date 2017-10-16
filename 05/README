@@ -1,0 +1,28 @@
+eliavsd,avikor13
+===============================================================================
+Eliav Shames, ID 317390268, eliavsd@cs.huji.ac.il
+Avi Korzec, ID 305088106, avikor13@cs.huji.ac.il
+===============================================================================
+
+                           Project 5 - Computer Architecture
+                           ---------------------------------- 
+  
+
+Submitted Files
+---------------
+README - This file.
+Memory.hdl - The chip that simulates the memory in the hack machine
+CPU.hdl - The chip that simulates the CPU in the hack machine
+Computer.hdl - The chip that simulates the hack machines topmost chip
+ExtendAlu.hdl - An extension of the ALU that supports additional operations
+CpuMul.hdl - This chip is an extension of the book CPU by using the extended ALU
+
+
+Additional Files
+----------------
+
+A 3-way multiplexor was created to allow the ExtendALU chip to disregard
+instruction[8] if instruction[7] is zero.
+
+In addition, an Or16Way chip was built, based on the Or8Way chip designed
+in project 1 to allow us to easily compare a 16-bit input to zero.

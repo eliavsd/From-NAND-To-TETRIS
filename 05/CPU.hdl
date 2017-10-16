@@ -1,0 +1,84 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/CPU.hdl
+
+/**
+ * The Hack CPU (Central Processing unit), consisting of an ALU,
+ * two registers named A and D, and a program counter named PC.
+ * The CPU is designed to fetch and execute instructions written in 
+ * the Hack machine language. In particular, functions as follows:
+ * Executes the inputted instruction according to the Hack machine 
+ * language specification. The D and A in the language specification
+ * refer to CPU-resident registers, while M refers to the external
+ * memory location addressed by A, i.e. to Memory[A]. The inM input 
+ * holds the value of this location. If the current instruction needs 
+ * to write a value to M, the value is placed in outM, the address 
+ * of the target location is placed in the addressM output, and the 
+ * writeM control bit is asserted. (When writeM==0, any value may 
+ * appear in outM). The outM and writeM outputs are combinational: 
+ * they are affected instantaneously by the execution of the current 
+ * instruction. The addressM and pc outputs are clocked: although they 
+ * are affected by the execution of the current instruction, they commit 
+ * to their new values only in the next time step. If reset==1 then the 
+ * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather 
+ * than to the address resulting from executing the current instruction. 
+ */
+
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+    // if instruction[15] == 0 then a-instruction (e.g, 0vvv...v)
+    // need to load the instruction to the A Register, therefore Priority(aInst) > Priority(ALUout)
+    Not(in=instruction[15], out=aInst);
+    Mux16(a=ALUout, b=instruction, sel=aInst, out=ALUxorAinst);
+    // Even if not ab a-instruction, we still want to write to ARegister if a c-instruction needs to
+    Or(a=aInst, b=instruction[5], out=loadA); 
+	ARegister(in=ALUxorAinst, load=loadA, out=Aout, out[0..14]=addressM);
+    
+    // otherwise c-instruction (e.g, 111ac1c2c3c4c5c6d1d2d3j1j2j3)
+    // ALU - What to compute? (Inputs) Where to store output? (Writing) What to do next? (Jumping)
+	//   ALU - Inputs: D Register, M/A Register, control bits
+	//   ALU - Inputs: D Register
+	And(a=instruction[15], b=instruction[4], out=writeToD);
+    DRegister(in=ALUout, load=writeToD, out=Dout);
+    
+	//   ALU - Inputs: M or A Register. Deciding using the a-bit. 
+	And(a=instruction[15], b=instruction[12], out=aBit);
+	Mux16(a=Aout, b=inM, sel=aBit, out=AxorMout);
+
+	// ALU Computing: using c1 to c6 bits. 
+    ALU(x=Dout, y=AxorMout, zx=instruction[11], nx=instruction[10], zy=instruction[9], 
+    	ny=instruction[8], f=instruction[7], no=instruction[6], zr=zr, ng=ng, out=outM, out=ALUout);
+
+    //   Jumping (instruction[0..2]): 000 - no jump, 001 - JGT, 010 - JEQ, 011 - JGE, 100 - JLT,
+    //            101 - JNE, 110 - JLE, 111 - JMP. Controlled using d1 to d3 and zr, ng. 
+	And(a=instruction[15], b=instruction[0], out=JGT);
+	And(a=instruction[15], b=instruction[1], out=JEQ);
+	And(a=instruction[15], b=instruction[2], out=JLT);
+	Not(in=ng, out=pos);
+	Not(in=zr, out=notZR);
+	And(a=pos, b=notZR, out=res1);
+	And(a=JGT, b=res1, out=res2);
+	And(a=JEQ, b=zr, out=res3);
+	And(a=JLT, b=ng, out=res4);
+	Or(a=res2, b=res3, out=res5);
+	Or(a=res4, b=res5, out=JMP);
+
+    // if its a c-instruction and instruction[3] == 1 then write to M
+	And(a=instruction[15], b=instruction[3], out=writeM);
+    
+   // PC handling. 
+   PC(in=Aout, inc=true, load=JMP, reset=reset, out[0..14]=pc);
+}

@@ -1,0 +1,15 @@
+/**
+ * Custom 3-way 16-bit multiplexor chip:
+ * out = a if sel == 10 or 00 (mul)
+ *       b if sel == 01 (shift)
+ *       c if sel == 11 (alu)
+ */
+
+CHIP Mux3Way16 {
+    IN a[16], b[16], c[16], sel[2];
+    OUT out[16];
+
+    PARTS:
+    Mux16 (a=b, b=c, sel=sel[1], out=bOrC);
+    Mux16 (a=a, b=bOrC, sel=sel[0], out=out);
+}

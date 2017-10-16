@@ -1,0 +1,25 @@
+odedab, okeren
+===============================================================================
+Oded Abramas, ID 203011226, oded.abramas@mail.huji.ac.il
+Or Keren, ID 301644522, or.keren1@mail.huji.ac.il
+===============================================================================
+
+                           Project 12 - Operating System
+                           ----------------------- 
+  
+
+Submitted Files
+---------------
+README - 	This file.
+Array.jack - 	System module to create and maintain an array.
+Keyboard.jack - System module to support recieving input from the keyboard.
+Math.jack -	System module to implement math functionality not supplied by the hardware.
+Memory.jack - 	System module to support memory allocation and the de-allocation.
+Output.jack - 	System module to handle character writing on the screen.
+Screen.jack - 	System module to support drawing on the screen.
+String.jack -	System module to implement string functionality.
+Sys.jack - 	System module to handle initializations of all the other modules, for every program.
+
+Remarks
+-------
+* N/A

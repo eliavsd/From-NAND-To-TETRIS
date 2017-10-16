@@ -1,0 +1,31 @@
+eliavsd
+===============================================================================
+Eliav Shames, ID 317390268, eliavsd@cs.huji.ac.il
+===============================================================================
+
+                           Project 2 - Combinational chips
+                           ---------------------------------- 
+  
+
+Submitted Files
+---------------
+README - This file.
+HalfAdder.hdl - A half adder. Adds 2 bits.
+FullAdder.hdl - A half adder. Adds 3 bits.
+Add16.hdl - An adder. Adds two 16-bit numbers.
+Inc16.hdl - Increments a 16-bit number by 1.
+ALU.hdl - An arithmetic logic unit. Performs a number of functions on
+ two 16-bit inputs.
+ShiftLeft.hdl - Multiplies a 16-bit input by 2, shifting
+ all bits one place to the left.
+ShiftRight.hdl - Divides a 16-bit input by 2, shifting
+ all bits one place to the right.
+Mul.hdl - Multiplies 2 16-bit inputs.
+
+Remarks
+-------
+* Multiplication of binary numbers is achieved by taking the first number
+ and multiplying it by each bit in the second number. Each time we multiply,
+ we shift the first number to the right. These temporary products are called
+ partial product. These are then summed to give us the correct output.
+
